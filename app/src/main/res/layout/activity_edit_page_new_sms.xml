@@ -139,33 +139,30 @@
         android:layout_height="match_parent">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:orientation="horizontal">
 
             <com.first.myapp.com.wheelview.WheelView
-                android:visibility="invisible"
                 android:id="@+id/wheel_year_new_sms"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
             <com.first.myapp.com.wheelview.WheelView
-                android:visibility="invisible"
                 android:id="@+id/wheel_month_new_sms"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
             <com.first.myapp.com.wheelview.WheelView
-                android:visibility="invisible"
                 android:id="@+id/wheel_day_new_sms"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-<com.first.myapp.com.myapplication.activity.GifView
+<!--<com.first.myapp.com.myapplication.activity.GifView
     android:id="@+id/gif_view"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content" />
+    android:layout_height="wrap_content" />-->
         </LinearLayout>
 
 

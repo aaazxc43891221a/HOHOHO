@@ -44,14 +44,14 @@ public class NewSmsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_page_new_sms);
         initView();
         setDefaulDateInWheel();
-        final GifView gifView = (GifView)findViewById(R.id.gif_view);
-        gifView.setMovieResource(R.raw.run);
-        gifView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                gifView.setPaused(!gifView.isPaused());
-            }
-        });
+//        final GifView gifView = (GifView)findViewById(R.id.gif_view);
+//        gifView.setMovieResource(R.raw.run);
+//        gifView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                gifView.setPaused(!gifView.isPaused());
+//            }
+//        });
     }
 
     private void initView() {

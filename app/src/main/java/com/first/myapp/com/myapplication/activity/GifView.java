@@ -19,9 +19,6 @@ import com.first.myapp.com.myapplication.R;
 
 public class GifView extends View {
 
-    /**
-     * 默认为1秒
-     */
     private static final int DEFAULT_MOVIE_DURATION = 1000;
 
     private int mMovieResourceId;
@@ -77,11 +74,6 @@ public class GifView extends View {
         }
     }
 
-    /**
-     * 设置gif图资源
-     *
-     * @param movieResId
-     */
     public void setMovieResource(int movieResId) {
         this.mMovieResourceId = movieResId;
         mMovie = Movie.decodeStream(getResources().openRawResource(
@@ -103,11 +95,6 @@ public class GifView extends View {
         invalidate();
     }
 
-    /**
-     * 设置暂停
-     *
-     * @param paused
-     */
     public void setPaused(boolean paused) {
         this.mPaused = paused;
         if (!paused) {
@@ -117,11 +104,6 @@ public class GifView extends View {
         invalidate();
     }
 
-    /**
-     * 判断gif图是否停止了
-     *
-     * @return
-     */
     public boolean isPaused() {
         return this.mPaused;
     }
