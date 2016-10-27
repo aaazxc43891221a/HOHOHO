@@ -185,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        //送达号码
 //        values.put("address", "58888");
 //        //送达内容
-//        values.put("body", "lalala test");
+//        values.put("body", "lalala ic_launchere");
 //
 //        values.put("person", getContactsIdByPhoneNum("58888"));
 //        resolver.insert(Uri.parse(uriSms), values);

@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.TextView;
 
 import com.first.myapp.com.myapplication.R;
@@ -34,6 +35,8 @@ public class NewSmsActivity extends AppCompatActivity {
     private int realYear;
     private int realMonth;
     private int realDay;
+    private String[] day_of_week = {"星期日","星期一","星期二","星期三","星期四","星期五","星期六"};
+    boolean b  = true;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,6 +44,14 @@ public class NewSmsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_page_new_sms);
         initView();
         setDefaulDateInWheel();
+        final GifView gifView = (GifView)findViewById(R.id.gif_view);
+        gifView.setMovieResource(R.raw.run);
+        gifView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gifView.setPaused(!gifView.isPaused());
+            }
+        });
     }
 
     private void initView() {
@@ -64,7 +75,7 @@ public class NewSmsActivity extends AppCompatActivity {
         //year
         int curYear = calendar.get(Calendar.YEAR);
 
-        DateNumericAdapter yearAdapter = new DateNumericAdapter(this, curYear - 30, curYear + 10, curYear - 1,"year");
+        DateNumericAdapter yearAdapter = new DateNumericAdapter(this, curYear - 30, curYear + 10, curYear - 1);
         year.setViewAdapter(yearAdapter);
 
         year.setCurrentItemByValue(curYear);
@@ -81,12 +92,12 @@ public class NewSmsActivity extends AppCompatActivity {
         month.addChangingListener(listener);
 
         //day
-        Log.e("kkk", "" + (calendar.get(Calendar.DAY_OF_MONTH) - 1));
+        Log.e("kkk", "calendar.get(Calendar.DAY_OF_WEEK)" + (calendar.get(Calendar.DAY_OF_WEEK) ));
         int curDay = calendar.get(Calendar.DAY_OF_MONTH) - 1;
         int maxDays = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-        day.setViewAdapter(new DateNumericAdapter(this, 1, maxDays, calendar.get(Calendar.DAY_OF_MONTH) - 1,"day"));
+        day.setViewAdapter(new DateNumericAdapter(this, 1, maxDays, calendar.get(Calendar.DAY_OF_MONTH) - 1));
         day.setCurrentItem(curDay);
-//        updateDays(year, month, day);
+        updateDays(year, month, day);
 
     }
 
@@ -101,13 +112,20 @@ public class NewSmsActivity extends AppCompatActivity {
         day.setCurrentItem(realDay, true);
     }
 
+    private String[] initDayOfWeek(int firstWeekDayOfMonth) {
+        String[] strings = new String[7];
+//        System.arraycopy(mBytes, 7, mDataBytes, 0, mDataLength - 6);
+        System.arraycopy(day_of_week,firstWeekDayOfMonth,strings,0,day_of_week.length-firstWeekDayOfMonth);
+        System.arraycopy(day_of_week,0,strings,firstWeekDayOfMonth,firstWeekDayOfMonth);
+        return strings;
+    }
+
     private class DateNumericAdapter extends NumericWheelAdapter {
         // Index of current item
         int currentItem;
         // Index of item to be highlighted
         int currentValue;
 
-        String yearOrDay;
 
         /**
          * Constructor
@@ -118,10 +136,6 @@ public class NewSmsActivity extends AppCompatActivity {
             setTextSize(16);
         }
 
-        public DateNumericAdapter(Context context, int minValue, int maxValue, int current,String yearOrDay) {
-            this(context, minValue, maxValue,current);
-            this.yearOrDay = yearOrDay;
-        }
         @Override
         protected void configureTextView(TextView view) {
             super.configureTextView(view);
@@ -132,10 +146,14 @@ public class NewSmsActivity extends AppCompatActivity {
         }
 
         @Override
+        public CharSequence getItemText(int index) {
+            return super.getItemText(index);
+        }
+
+        @Override
         public View getItem(int index, View cachedView, ViewGroup parent) {
             currentItem = index;
 
-            Log.e("kkk", "走了一次getItem " + yearOrDay);
             return super.getItem(index, cachedView, parent);
         }
     }
@@ -159,7 +177,7 @@ public class NewSmsActivity extends AppCompatActivity {
         protected void configureTextView(TextView view) {
             super.configureTextView(view);
             if (currentItem == currentValue) {
-                view.setTextColor(0xFF0000F0);
+//                view.setTextColor(0xFF0000F0);
             }
             view.setTypeface(Typeface.SANS_SERIF);
         }

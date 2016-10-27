@@ -19,4 +19,14 @@
         <item name="android:layout_marginRight">40dp</item>
     </style>
 
+    <!-- GIF动画所用 -->
+    <declare-styleable name="GifView">
+        <attr name="gif" format="reference" />
+        <attr name="paused" format="boolean" />
+    </declare-styleable>
+    <declare-styleable name="CustomTheme">
+        <attr name="gifViewStyle" format="reference" />
+    </declare-styleable>
+
+    <style name="Widget_GifView"></style>
 </resources>
