@@ -21,16 +21,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="query" />
+
         <Button
             android:id="@+id/go_to_edit_page"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="edit" />
+
         <Button
             android:id="@+id/bt_hide_app"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="hide" />
+
+        <Button
+            android:id="@+id/bt_receive_sms"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="receivedSms" />
     </LinearLayout>
 
     <ListView

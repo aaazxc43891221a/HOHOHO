@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
+import com.first.myapp.com.myapplication.activity.MainActivity;
+
 
 /**
  * Created by chauvard on 10/10/16.

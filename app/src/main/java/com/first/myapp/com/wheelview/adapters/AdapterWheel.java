@@ -56,6 +56,11 @@ public class AdapterWheel extends AbstractWheelTextAdapter {
     }
 
     @Override
+    public int getMinValue() {
+        return 0;
+    }
+
+    @Override
     protected CharSequence getItemText(int index) {
         return adapter.getItem(index);
     }

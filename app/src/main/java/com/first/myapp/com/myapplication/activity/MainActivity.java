@@ -1,7 +1,6 @@
-package com.first.myapp.com.myapplication;
+package com.first.myapp.com.myapplication.activity;
 
 import android.Manifest;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -16,6 +15,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.first.myapp.com.myapplication.Constant;
+import com.first.myapp.com.myapplication.DBService;
+import com.first.myapp.com.myapplication.R;
+import com.first.myapp.com.myapplication.SmsDetailInfo;
+import com.first.myapp.com.myapplication.SmsListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,12 +48,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private View bt_edit;
     private View bt_hide;
+    private View bt_receive_sms;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //如果API高于或等于23,校验是否已获取权限
+        getPermissionAndSetDefaultApp();
+
+        initView();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getPermissionAndSetDefaultApp();
+    }
+
+    private void getPermissionAndSetDefaultApp() {
         if (Build.VERSION.SDK_INT >= Constant.API_M) {
             List<String> stringsList = new ArrayList<>();
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
@@ -71,9 +89,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 ActivityCompat.requestPermissions(this, strings, MY_RUNTIME_PERMISSIONS);
             }
-
             final String myPackageName = getPackageName();
-
+            //判断是否默认应用
             if (!Telephony.Sms.getDefaultSmsPackage(this).equals(myPackageName)) {
                 //to do 先跳dialog  告知用户必须要同意
                 Intent intent =
@@ -83,9 +100,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intent);
             }
         }
-
-        initView();
-
     }
 
     //获取权限后回调,确认权限是否都已取得,如未全部取得,就不执行逻辑
@@ -112,6 +126,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bt_edit.setOnClickListener(this);
         bt_hide = findViewById(R.id.bt_hide_app);
         bt_hide.setOnClickListener(this);
+        bt_receive_sms = findViewById(R.id.bt_receive_sms);
+        bt_receive_sms.setOnClickListener(this);
         dbService = DBService.shareInstance(getApplicationContext());
         doGetSms();
 
@@ -132,9 +148,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.query_sms:
+                getPermissionAndSetDefaultApp();
 //                TimePickerDialog timePickerDialog = new TimePickerDialog(this);
 //                timePickerDialog.show();
-                dbService.insertSmsInfo();
+//                dbService.insertSmsInfo();
+                dbService.updateSmsInfo();
                 break;
             case R.id.go_to_edit_page:
                 Intent intent = new Intent(this, NewSmsActivity.class);
@@ -143,6 +161,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.bt_hide_app:
                 PackageManager manager = getPackageManager();
                 manager.setComponentEnabledSetting(getComponentName(), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+                break;
+            case R.id.bt_receive_sms:
+                getPermissionAndSetDefaultApp();
+//                Intent receiveBroadcast = new Intent();
+//                receiveBroadcast.setAction("android.provier.Telephony.SMS_RECEIVED");
+//                sendBroadcast(receiveBroadcast);
+                dbService.insertSmsInfo();
                 break;
             default:
                 break;

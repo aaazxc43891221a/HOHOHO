@@ -387,6 +387,18 @@ public class WheelView extends View {
 		}
 	}
 
+	public void setCurrentItemByValue(int value) {
+		if (viewAdapter == null || viewAdapter.getItemsCount() == 0) {
+			return; // throw?
+		}
+		int minValue = viewAdapter.getMinValue();
+		if (value<minValue){return;}else {setCurrentItem(value - minValue);}
+
+	}
+
+
+
+
 	/**
 	 * Sets the current item w/o animation. Does nothing when index is wrong.
 	 * 

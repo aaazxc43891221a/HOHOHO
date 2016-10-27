@@ -61,4 +61,7 @@ public interface WheelViewAdapter {
 	 * @param observer the observer to be unregistered
 	 */
 	void unregisterDataSetObserver (DataSetObserver observer);
+
+
+	public int getMinValue();
 }

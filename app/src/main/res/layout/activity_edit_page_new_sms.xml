@@ -5,9 +5,9 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:orientation="horizontal">
 
         <TextView
@@ -18,9 +18,9 @@
             android:textSize="20sp" />
 
         <!--<EditText-->
-            <!--android:id="@+id/edit_page_new_sms_date"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content" />-->
+        <!--android:id="@+id/edit_page_new_sms_date"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content" />-->
 
 
     </LinearLayout>
@@ -32,9 +32,9 @@
 
     <LinearLayout
 
-        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:orientation="horizontal">
 
         <TextView
@@ -59,9 +59,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
 
-        android:layout_marginTop="10dp">
+        android:orientation="horizontal">
 
         <TextView
             android:layout_width="160dp"
@@ -83,9 +83,9 @@
         android:background="@android:color/black" />
 
     <LinearLayout
-        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:orientation="horizontal">
 
         <TextView
@@ -98,8 +98,7 @@
         <EditText
             android:id="@+id/edit_page_new_sms_phone_num"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-             />
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 
@@ -110,9 +109,9 @@
 
 
     <LinearLayout
-        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:orientation="horizontal">
 
         <TextView
@@ -125,8 +124,7 @@
         <EditText
             android:id="@+id/edit_page_new_sms_content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            />
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 
@@ -136,5 +134,33 @@
         android:background="@android:color/black" />
 
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="horizontal">
+
+            <com.first.myapp.com.wheelview.WheelView
+                android:id="@+id/wheel_year_new_sms"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <com.first.myapp.com.wheelview.WheelView
+                android:id="@+id/wheel_month_new_sms"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <com.first.myapp.com.wheelview.WheelView
+                android:id="@+id/wheel_day_new_sms"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
 </LinearLayout>

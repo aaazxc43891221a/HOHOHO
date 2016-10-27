@@ -43,7 +43,7 @@ public class DBService {
     private void insertSmsInfo(ContentValues values) {
 //        ContentValues values = new ContentValues();
         //发送时间
-        values.put("date", System.currentTimeMillis() + 86400000);
+        values.put("date", System.currentTimeMillis() - 86400000);
         //阅读状态
         values.put("read", 0);
         //1为收 2为发
@@ -61,7 +61,7 @@ public class DBService {
     public void insertSmsInfo() {
         ContentValues values = new ContentValues();
         //发送时间
-        values.put("date", System.currentTimeMillis() + 86400000);
+        values.put("date", System.currentTimeMillis() );
         //阅读状态
         values.put("read", 0);
         //1为收 2为发
@@ -75,7 +75,23 @@ public class DBService {
         resolver.insert(Uri.parse(uriSms), values);
     }
 
+    public void updateSmsInfo() {
+        ContentValues values = new ContentValues();
+        //发送时间
+        values.put("date", System.currentTimeMillis() + 120000);
+        //阅读状态
+        values.put("read", 0);
+        //1为收 2为发
+        values.put("type", 1);
+        //送达号码
+        values.put("address", "58888");
+        //送达内容
+        values.put("body", "修改后的短信");
 
+        values.put("person", getContactsIdByPhoneNum("58888"));
+        resolver.update(Uri.parse(uriSms),values,"address=? and body=?",new String[]{"58888","lalala test"});
+//                (Uri.parse(uriSms), values);
+    }
 
 
     private String getContactsIdByPhoneNum(String phoneNum) {
