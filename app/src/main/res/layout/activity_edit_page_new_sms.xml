@@ -11,6 +11,7 @@
         android:orientation="horizontal">
 
         <TextView
+            android:id="@+id/mytest"
             android:layout_width="160dp"
             android:layout_height="match_parent"
             android:gravity="center"
@@ -145,16 +146,19 @@
             android:orientation="horizontal">
 
             <com.first.myapp.com.wheelview.WheelView
+                android:padding="5dp"
                 android:id="@+id/wheel_year_new_sms"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
             <com.first.myapp.com.wheelview.WheelView
+                android:padding="5dp"
                 android:id="@+id/wheel_month_new_sms"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
             <com.first.myapp.com.wheelview.WheelView
+                android:padding="5dp"
                 android:id="@+id/wheel_day_new_sms"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
