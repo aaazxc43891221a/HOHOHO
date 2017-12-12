@@ -5,17 +5,29 @@ package com.first.myapp.com.myapplication;
  */
 
 public class SmsDetailInfo {
+    private int id;
     private String phoneNum;
     private String contactsName;
     private String type;
     private String data;
 
+    public SmsDetailInfo() {
+    }
 
-    public SmsDetailInfo(String phoneNum, String contactsName, String type, String data) {
+    public SmsDetailInfo(int id, String phoneNum, String contactsName, String type, String data) {
+        this.id = id;
         this.phoneNum = phoneNum;
         this.contactsName = contactsName;
         this.type = type;
         this.data = data;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getPhoneNum() {
@@ -48,5 +60,16 @@ public class SmsDetailInfo {
 
     public void setData(String data) {
         this.data = data;
+    }
+
+    @Override
+    public String toString() {
+        return "SmsDetailInfo{" +
+                "id=" + id +
+                ", phoneNum='" + phoneNum + '\'' +
+                ", contactsName='" + contactsName + '\'' +
+                ", type='" + type + '\'' +
+                ", data='" + data + '\'' +
+                '}';
     }
 }

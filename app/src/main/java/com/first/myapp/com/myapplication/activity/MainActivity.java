@@ -16,10 +16,11 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.first.myapp.com.myapplication.Constant;
-import com.first.myapp.com.myapplication.DBService;
 import com.first.myapp.com.myapplication.R;
 import com.first.myapp.com.myapplication.SmsDetailInfo;
 import com.first.myapp.com.myapplication.SmsListAdapter;
+import com.first.myapp.com.myapplication.database.MyContactDBService;
+import com.first.myapp.com.myapplication.database.SMSDBService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * ContactsContract.CommonDataKinds.Email.CONTENT_URI;//获取联系人邮箱的Uri
      * content://com.android.contacts/data/emails
      */
-    private DBService dbService;
+    private SMSDBService SMSDBService;
     private ListView sms_list;
     private Button bt_query;
     private List<SmsDetailInfo> list;
@@ -49,21 +50,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private View bt_edit;
     private View bt_hide;
     private View bt_receive_sms;
+    private MyContactDBService contactDBService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initView();
+
         //如果API高于或等于23,校验是否已获取权限
         getPermissionAndSetDefaultApp();
 
-        initView();
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        Log.e("kkkk", "onResume: ");
         getPermissionAndSetDefaultApp();
     }
 
@@ -82,11 +86,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
                 stringsList.add(Manifest.permission.RECEIVE_SMS);
             }
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                stringsList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            }
             if (stringsList.size() > 0) {
                 String[] strings = new String[stringsList.size()];
                 for (int i = 0; i < stringsList.size(); i++) {
                     strings[i] = stringsList.get(i);
                 }
+
                 ActivityCompat.requestPermissions(this, strings, MY_RUNTIME_PERMISSIONS);
             }
             final String myPackageName = getPackageName();
@@ -109,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (requestCode) {
             case MY_RUNTIME_PERMISSIONS:
                 Log.e("kkk", "执行doGetSms();");
+                contactDBService.refreshTable();
                 doGetSms();
                 break;
             default:
@@ -128,7 +137,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bt_hide.setOnClickListener(this);
         bt_receive_sms = findViewById(R.id.bt_receive_sms);
         bt_receive_sms.setOnClickListener(this);
-        dbService = DBService.shareInstance(getApplicationContext());
+        SMSDBService = SMSDBService.shareInstance(getApplicationContext());
+        contactDBService = new MyContactDBService(this);
+        contactDBService.refreshTable();
         doGetSms();
 
 
@@ -137,7 +148,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void doGetSms() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
-            list = dbService.getSmsDetailInfoList();
+            list = SMSDBService.getSmsDetailInfoList();
+            List<SmsDetailInfo> allContact = SMSDBService.getAllContact(this);
+            for (int i = 0; i <allContact.size() ; i++) {
+                Log.e("kkkk", "doGetSms: "+allContact.get(i) );
+            }
+
             SmsListAdapter smsListAdapter = new SmsListAdapter(list, MainActivity.this);
             sms_list.setAdapter(smsListAdapter);
         }
@@ -151,8 +167,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 getPermissionAndSetDefaultApp();
 //                TimePickerDialog timePickerDialog = new TimePickerDialog(this);
 //                timePickerDialog.show();
-//                dbService.insertSmsInfo();
-                dbService.updateSmsInfo();
+//                SMSDBService.insertSmsInfo();
+                SMSDBService.updateSmsInfo();
                 break;
             case R.id.go_to_edit_page:
                 Intent intent = new Intent(this, NewSmsActivity.class);
@@ -167,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                Intent receiveBroadcast = new Intent();
 //                receiveBroadcast.setAction("android.provier.Telephony.SMS_RECEIVED");
 //                sendBroadcast(receiveBroadcast);
-                dbService.insertSmsInfo();
+                SMSDBService.insertSmsInfo();
                 break;
             default:
                 break;

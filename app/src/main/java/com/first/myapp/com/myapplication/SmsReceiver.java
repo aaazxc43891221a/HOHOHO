@@ -20,7 +20,7 @@ public class SmsReceiver extends BroadcastReceiver {
             case "android.intent.action.NEW_OUTGOING_CALL":
                 Log.e("kkk", "收到广播");
                 String phone = getResultData();//得到外拔电话
-                if (phone.equals("123456")) {
+                if (phone.equals("991722")) {
                     setResultData(null);
 //                    setResultData(null);
 //                    abortBroadcast();
