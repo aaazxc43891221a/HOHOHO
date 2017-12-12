@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/dialog_view"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/loading_oval"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="@dimen/layout_common_padding_s"
+            android:src="@mipmap/rotatepic"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/dialog_background"
+            android:orientation="vertical">
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp">
+
+                <TextView
+                    android:id="@+id/dialog_title_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="@string/notice"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/dialog_title_size"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/dialog_sub_title_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/dialog_title_text"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="@dimen/black_border_edit_text_horizontal_padding"
+                    android:layout_toRightOf="@+id/dialog_title_text"
+                    android:textColor="@color/gray"
+                    android:textSize="10sp"
+                    android:visibility="gone" />
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/dialog_content_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingBottom="15dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="10dp"
+                android:textColor="@color/dark_gray"
+                android:textSize="16sp" />
+
+
+            <include layout="@layout/whole_line_view" />
+
+            <TextView
+                android:id="@+id/dialog_ok_button"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/image_view_button_common_height"
+                android:layout_gravity="center"
+                android:layout_weight="2"
+                android:background="@drawable/message_box_single_button_selector"
+                android:gravity="center"
+                android:singleLine="true"
+                android:text="@string/ok"
+                android:textAllCaps="false"
+                android:textColor="@color/blue"
+                android:textSize="@dimen/dialog_title_size" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

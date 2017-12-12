@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -14,22 +15,28 @@ import java.util.List;
  */
 
 public class SmsListAdapter extends BaseAdapter {
-    private List<SmsDetailInfo> list;
+    private List<SmsDetailInfo> mList;
     private Context mContext;
 
     public SmsListAdapter(List<SmsDetailInfo> list, Context context) {
         this.mContext = context;
-        this.list = list;
+        mList = new ArrayList<>();
+        setList(list);
+    }
+
+    public void setList(List<SmsDetailInfo> list) {
+        mList.clear();
+        mList.addAll(list);
     }
 
     @Override
     public int getCount() {
-        return list.size();
+        return mList.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return list.get(position);
+        return mList.get(position);
     }
 
     @Override
@@ -54,10 +61,10 @@ public class SmsListAdapter extends BaseAdapter {
             holder = (Holder) convertView.getTag();
         }
         holder.id.setText(String.valueOf(position + 1));
-        holder.phoneNum.setText(list.get(position).getPhoneNum());
-        holder.name.setText(list.get(position).getContactsName());
-        holder.data.setText(list.get(position).getData());
-        holder.type.setText(list.get(position).getType());
+        holder.phoneNum.setText(mList.get(position).getPhoneNum());
+        holder.name.setText(mList.get(position).getContactsName());
+        holder.data.setText(mList.get(position).getData());
+        holder.type.setText(mList.get(position).getType());
 
 
         return convertView;

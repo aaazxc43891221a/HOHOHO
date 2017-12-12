@@ -1,8 +1,9 @@
-package com.first.myapp.com.myapplication.mytest;
+package com.first.myapp.com.myapplication.util;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Looper;
@@ -13,33 +14,34 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 /**
- * Created by chauvard on 12/11/17.
+ * UncaughtException handler, handle uncaught exception and record the crash log
+ * Created by lynnliu on 12/22/15.
  */
-public class CrashHandler implements Thread.UncaughtExceptionHandler {
+public class CrashHandler implements UncaughtExceptionHandler {
 
     public static final String TAG = "CrashHandler";
     private static final String SD_PATH = Environment.getExternalStorageDirectory().getPath();
 
     //系统默认的UncaughtException处理类
-    private Thread.UncaughtExceptionHandler mDefaultHandler;
+    private UncaughtExceptionHandler mDefaultHandler;
     //CrashHandler实例
     private static CrashHandler INSTANCE = new CrashHandler();
     //程序的Context对象
     private Context mContext;
     //用来存储设备信息和异常信息
-    private Map<String, String> infos = new HashMap<>();
+    private Map<String, String> infos = new HashMap<String, String>();
 
     //用于格式化日期,作为日志文件名的一部分
-    private DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.getDefault());
+    private DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 
     /**
      * 保证只有一个CrashHandler实例
@@ -80,7 +82,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
                 Thread.sleep(3000);
             } catch (InterruptedException e) {
                 LogUtil.log(LogUtil.LogLevel.ERROR, TAG, "error : ");
-                e.printStackTrace();
+
             }
             //退出程序
             android.os.Process.killProcess(android.os.Process.myPid());
@@ -104,9 +106,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         new Thread() {
             @Override
             public void run() {
-                if (Looper.myLooper()==null){
-                    Looper.prepare();
-                }
+                Looper.prepare();
                 Toast.makeText(mContext, "Sorry for the exception.", Toast.LENGTH_SHORT).show();
                 Looper.loop();
             }
@@ -133,9 +133,9 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
                 infos.put("versionName", versionName);
                 infos.put("versionCode", versionCode);
             }
-        } catch (PackageManager.NameNotFoundException e) {
+        } catch (NameNotFoundException e) {
             LogUtil.log(LogUtil.LogLevel.ERROR, TAG, "an error occured when collect package info");
-            e.printStackTrace();
+//            e.printStackTrace();
         }
         Field[] fields = Build.class.getDeclaredFields();
         for (Field field : fields) {
@@ -145,7 +145,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
                 LogUtil.log(LogUtil.LogLevel.DEBUG, TAG, field.getName() + " : " + field.get(null));
             } catch (Exception e) {
                 LogUtil.log(LogUtil.LogLevel.ERROR, TAG, "an error occured when collect crash info");
-                e.printStackTrace();
+//                e.printStackTrace();
             }
         }
     }
@@ -158,7 +158,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
      */
     private String saveCrashInfo2File(Throwable ex) {
 
-        StringBuilder sb = new StringBuilder();
+        StringBuffer sb = new StringBuffer();
         for (Map.Entry<String, String> entry : infos.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
@@ -182,7 +182,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             String time = formatter.format(new Date());
             String fileName = "crash-" + time + "-" + timestamp + ".log";
             if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-                String path = SD_PATH + "/sc_log/";
+                String path = SD_PATH + "/DeviceConfigurator/";
                 File dir = new File(path);
                 if (!dir.exists()) {
                     dir.mkdirs();
@@ -194,9 +194,8 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             return fileName;
         } catch (Exception e) {
             LogUtil.log(LogUtil.LogLevel.ERROR, TAG, "an error occured while writing file...");
-            e.printStackTrace();
+//            e.printStackTrace();
         }
         return null;
     }
 }
-

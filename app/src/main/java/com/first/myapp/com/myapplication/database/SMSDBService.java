@@ -7,10 +7,10 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.telephony.PhoneNumberUtils;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.first.myapp.com.myapplication.SmsDetailInfo;
+import com.first.myapp.com.myapplication.util.StringUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -62,6 +62,11 @@ public class SMSDBService {
 
     //to delete
     public void insertSmsInfo() {
+        insertSmsInfo("lalala test");
+    }
+
+    //to delete
+    public void insertSmsInfo(String content) {
         ContentValues values = new ContentValues();
         //发送时间
         values.put("date", System.currentTimeMillis());
@@ -72,16 +77,16 @@ public class SMSDBService {
         //送达号码
         values.put("address", "58888");
         //送达内容
-        values.put("body", "lalala test");
+        values.put("body", content);
 
         values.put("person", getContactsIdByPhoneNum("58888"));
         resolver.insert(Uri.parse(uriSms), values);
     }
 
-    public void updateSmsInfo() {
+    public void modifySmsInfo() {
         ContentValues values = new ContentValues();
         //发送时间
-        values.put("date", System.currentTimeMillis() + 120000);
+        values.put("date", System.currentTimeMillis() + 5000);
         //阅读状态
         values.put("read", 0);
         //1为收 2为发
@@ -139,12 +144,23 @@ public class SMSDBService {
                     .getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
             Log.e("kkk", "contactid: " + contactid + "    contactName: " + contactName);
 
-
 //            //获取联系人号码
 //            String phoneNum = cursorContent.getString(
 //                    cursorContent.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 //            Log.e("kkk", "phoneNum: "+phoneNum );
 //            map.put(phoneNum, contactName);
+
+            Cursor phoneNumbers = resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = "
+                    + contactid, null, null);
+            // 取得电话号码(可能存在多个号码)
+            while (phoneNumbers.moveToNext()) {
+                String originalPhoneNumber = phoneNumbers.getString(phoneNumbers.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                Log.e("rrrr", "originalPhoneNumber: " + originalPhoneNumber);
+                String formatPhoneNumber = formatPhoneNumber(originalPhoneNumber);
+                map.put(formatPhoneNumber, contactName);
+//                sbLog.append("Phone=" + originalPhoneNumber + ";");
+            }
+            phoneNumbers.close();
         }
         cursorContent.close();
         Cursor cursorSms = resolver.query(Uri.parse(uriSms), null, null, null, null);
@@ -172,15 +188,35 @@ public class SMSDBService {
             //联系人列表里的序号
             int contentId = cursorSms.getInt(cursorSms.getColumnIndex("person"));
 //            Log.e("kkk", "contentId: " + contentId);
-            String contactsName = map.get(phoneNumber);
+            String contactsName = map.get(formatPhoneNumber(phoneNumber));
             if (contactsName == null) {
                 contactsName = "null";
             }
             list.add(new SmsDetailInfo(0, phoneNumber, contactsName, smsType, data));
         }
         cursorSms.close();
+        Log.e("kkkk", "getSmsDetailInfoList: list: " + list);
         return list;
 
+    }
+
+    private String formatPhoneNumber(String originalPhoneNumber) {
+        if (StringUtil.isEmpty(originalPhoneNumber)) return "";
+        StringBuffer stringBuffer = new StringBuffer("");
+        for (int i = 0; i < originalPhoneNumber.length(); i++) {
+            char c = originalPhoneNumber.charAt(i);
+            int parseInt = 0;
+            try {
+                parseInt = Integer.parseInt("" + c);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                continue;
+            }
+            if (parseInt >= 0 && parseInt <= 9) {
+                stringBuffer.append(c);
+            }
+        }
+        return stringBuffer.toString();
     }
 
 
@@ -261,58 +297,4 @@ public class SMSDBService {
     }
 
 
-    public static List<SmsDetailInfo> getAllContact(Context context) {
-        List<SmsDetailInfo> list = new ArrayList<SmsDetailInfo>();
-        //利用系统的ContactProvider来查询联系人信息
-        //数据来自contacts,data表
-        ContentResolver cr = context.getContentResolver();
-        String[] projection = new String[]{ContactsContract.Contacts._ID, ContactsContract.Contacts.PHOTO_ID};
-        Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, projection,
-                null, null, null);
-        //遍历从contacts数据表中的数据集
-        while (cursor.moveToNext()) {
-            SmsDetailInfo contact = new SmsDetailInfo();
-//            contact.set(cursor.getInt(0));
-            contact.setId(cursor.getInt(1));
-            //利用联系人的_id,到Data表中继续查询
-            ContentResolver cr2 = context.getContentResolver();
-            Cursor cursor2 = cr2.query(ContactsContract.Data.CONTENT_URI,
-                    new String[]{ContactsContract.Contacts.Data.MIMETYPE, ContactsContract.Data.DATA1},
-                    ContactsContract.Contacts.Data.RAW_CONTACT_ID + "=?", new String[]{String.valueOf(contact.getId())},
-                    null);
-            //从data表中取回的，特定id联系人的具体数据
-            while (cursor2.moveToNext()) {
-                String mimeTypeString = cursor2.getString(0);
-//                if (mimeTypeString.equals("vnd.android.cursor.item/email_v2")) {
-//                    contact.setEmail(cursor2.getString(1));
-//                }
-                if (mimeTypeString.equals("vnd.android.cursor.item/name")) {
-                    contact.setContactsName(cursor2.getString(1));
-                }
-                if (mimeTypeString.equals("vnd.android.cursor.item/phone_v2")) {
-                    contact.setPhoneNum(cursor2.getString(1));
-                }
-//                if (mimeTypeString.equals("vnd.android.cursor.item/postal-address_v2")) {
-//                    contact.setAddress(cursor2.getString(1));
-//                }
-                if (mimeTypeString.equals("vnd.android.cursor.item/photo")) {
-                    //contact.setPhoto_id(cursor2.getInt(1));
-                    //int photo=contact.get_id();
-                    //long i=photo;
-                    /*InputStream input=ContactsContract.Contacts.openContactPhotoInputStream(cr2,
-                    ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI,
-                    (long)contact.get_id()
-                                    //Long.parseLong(String.valueOf(contact.getPhoto_id()))
-                                    //photo
-                                    ));
-                    contact.setPhotoBitmap(BitmapFactory.decodeStream(input));*/
-                }
-            }
-            cursor2.close();
-            list.add(contact);
-        }
-        cursor.close();
-        Log.e("kkkk", "getAllContact: list: "+list );
-        return list;
-    }
 }

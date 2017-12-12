@@ -2,8 +2,8 @@ package com.first.myapp.com.myapplication;
 
 import android.app.Application;
 
-import com.first.myapp.com.myapplication.database.MyContactDBService;
-import com.first.myapp.com.myapplication.mytest.CrashHandler;
+import com.first.myapp.com.myapplication.util.CrashHandler;
+
 
 /**
  * Created by chauvard on 10/13/16.

@@ -1,16 +1,19 @@
-package com.first.myapp.com.myapplication.mytest;
+package com.first.myapp.com.myapplication.util;
 
 import android.os.Environment;
+import android.support.v7.appcompat.BuildConfig;
+import android.text.TextUtils;
 import android.util.Log;
+
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
- * Created by chauvard on 12/11/17.
+ * The util for log. Set whether print log, save log to file and the file log level.
+ * Created by liunan on 1/14/15.
  */
-
 public class LogUtil {
     private static final String SD_PATH = Environment.getExternalStorageDirectory().getPath();
 
@@ -84,18 +87,18 @@ public class LogUtil {
                     break;
             }
         }
-//        if (isLogSaved && (BuildConfig.DEBUG || isDebugMode())) {
-        saveLogToFile(level, tag, message);
-//        }
+        if (isLogSaved && BuildConfig.DEBUG) {
+            saveLogToFile(level, tag, message);
+        }
     }
 
     private static void saveLogToFile(LogLevel level, String tag, String message) {
-//        if (TextUtils.isEmpty(mLogFileName)) {
-        mLogFileName = DateTimeUtil.getNowDateTimeString("yyyy-MM-dd-HH") + ".log";
-//        }
+        if (TextUtils.isEmpty(mLogFileName)) {
+            mLogFileName = DateTimeUtil.getNowDateTimeString("yyyy-MM-dd") + ".log";
+        }
         try {
             if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-                String path = SD_PATH + "/mp_log/LogUtil/";
+                String path = SD_PATH + "/DeviceConfigurator/LogUtil/";
                 File dir = new File(path);
                 if (!dir.exists()) {
                     dir.mkdirs();
@@ -106,14 +109,7 @@ public class LogUtil {
                 fos.close();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
     }
-
-    private static boolean isDebugMode() {
-        String fileName = SD_PATH + "/sc_log/LogUtil/sc_debug";
-        File file = new File(fileName);
-        return file.exists();
-    }
 }
-

@@ -1,0 +1,13 @@
+<resources>
+
+    <!-- for sonim dimens -->
+    <dimen name="devicelist_tab_radius">60dp</dimen>
+
+
+    <dimen name="paried_device_sensor_value">26sp</dimen>
+    <dimen name="paried_device_sensor_name">24sp</dimen>
+    <dimen name="paried_device_sensor_unit">18sp</dimen>
+    <dimen name="default_medium_sensor_name">20sp</dimen>
+
+
+</resources>

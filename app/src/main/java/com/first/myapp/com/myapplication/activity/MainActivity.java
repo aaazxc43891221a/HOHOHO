@@ -1,10 +1,14 @@
 package com.first.myapp.com.myapplication.activity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.Telephony;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -16,11 +20,13 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.first.myapp.com.myapplication.Constant;
+import com.first.myapp.com.myapplication.MyViews.LoadingProgressDialog;
 import com.first.myapp.com.myapplication.R;
 import com.first.myapp.com.myapplication.SmsDetailInfo;
 import com.first.myapp.com.myapplication.SmsListAdapter;
 import com.first.myapp.com.myapplication.database.MyContactDBService;
 import com.first.myapp.com.myapplication.database.SMSDBService;
+import com.first.myapp.com.myapplication.util.AsyncTaskExecutorUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +38,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 102;
     private static final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 103;
     private static final int MY_RUNTIME_PERMISSIONS = 100;
+
+    private static final int MSG_SHOW_LOADING_DIALOG = 0;
+    private static final int MSG_HIDE_LOADING_DIALOG = 1;
+    private static final int MSG_REFRESH_LIST_VIEW = 2;
     /**
      * ContactsContract.Contacts.CONTENT_URI;//联系人的Uri对象
      * content://com.android.contacts.raw_contacts
@@ -51,16 +61,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private View bt_hide;
     private View bt_receive_sms;
     private MyContactDBService contactDBService;
+    private SmsListAdapter mSmsListAdapter;
+    private View mInsertSmsButton;
+    private View mModifySmsButton;
+    private LoadingProgressDialog mDialog;
+    private Activity mActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
-
+        mActivity = this;
         //如果API高于或等于23,校验是否已获取权限
         getPermissionAndSetDefaultApp();
-
 
     }
 
@@ -69,6 +83,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onResume();
         Log.e("kkkk", "onResume: ");
         getPermissionAndSetDefaultApp();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mDialog != null && mDialog.isShowing()) {
+            mDialog.dismiss();
+        }
     }
 
     private void getPermissionAndSetDefaultApp() {
@@ -137,10 +159,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bt_hide.setOnClickListener(this);
         bt_receive_sms = findViewById(R.id.bt_receive_sms);
         bt_receive_sms.setOnClickListener(this);
+        mInsertSmsButton = findViewById(R.id.bt_insert_sms);
+        mInsertSmsButton.setOnClickListener(this);
+        mModifySmsButton = findViewById(R.id.bt_modify_sms);
+        mModifySmsButton.setOnClickListener(this);
         SMSDBService = SMSDBService.shareInstance(getApplicationContext());
         contactDBService = new MyContactDBService(this);
         contactDBService.refreshTable();
-        doGetSms();
+//        doGetSms();
 
 
     }
@@ -148,14 +174,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void doGetSms() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
-            list = SMSDBService.getSmsDetailInfoList();
-            List<SmsDetailInfo> allContact = SMSDBService.getAllContact(this);
-            for (int i = 0; i <allContact.size() ; i++) {
-                Log.e("kkkk", "doGetSms: "+allContact.get(i) );
-            }
-
-            SmsListAdapter smsListAdapter = new SmsListAdapter(list, MainActivity.this);
-            sms_list.setAdapter(smsListAdapter);
+            LoadSmsTask loadSmsTask = new LoadSmsTask();
+            AsyncTaskExecutorUtil.executeAsyncTask(loadSmsTask);
         }
 
     }
@@ -168,7 +188,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                TimePickerDialog timePickerDialog = new TimePickerDialog(this);
 //                timePickerDialog.show();
 //                SMSDBService.insertSmsInfo();
-                SMSDBService.updateSmsInfo();
+                doGetSms();
+//                SMSDBService.modifySmsInfo();
                 break;
             case R.id.go_to_edit_page:
                 Intent intent = new Intent(this, NewSmsActivity.class);
@@ -185,81 +206,82 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                sendBroadcast(receiveBroadcast);
                 SMSDBService.insertSmsInfo();
                 break;
+            case R.id.bt_modify_sms:
+                getPermissionAndSetDefaultApp();
+                SMSDBService.modifySmsInfo();
+                break;
+            case R.id.bt_insert_sms:
+                getPermissionAndSetDefaultApp();
+                SMSDBService.insertSmsInfo();
+                break;
             default:
                 break;
         }
     }
 
-//    private void insertInfo() {
-//        ContentValues values = new ContentValues();
-//        //发送时间
-//        values.put("date", System.currentTimeMillis() + 86400000);
-//        //阅读状态
-//        values.put("read", 0);
-//        //1为收 2为发
-//        values.put("type", 1);
-//        //送达号码
-//        values.put("address", "58888");
-//        //送达内容
-//        values.put("body", "lalala ic_launchere");
-//
-//        values.put("person", getContactsIdByPhoneNum("58888"));
-//        resolver.insert(Uri.parse(uriSms), values);
-//    }
 
-//    private String getContactsIdByPhoneNum(String phoneNum) {
-//        String id = null;
-//        Cursor cursor = null;
-//        try {
-//            cursor = resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-//                    new String[]{ContactsContract.CommonDataKinds.Phone.CONTACT_ID, ContactsContract.CommonDataKinds.Phone.NUMBER},
-//                    ContactsContract.CommonDataKinds.Phone.NUMBER + " = '"
-//                            + phoneNum + "'", // WHERE clause.
-//                    null,
-//                    null);
-//            if (cursor != null && cursor.moveToFirst()) {
-//                while (!cursor.isAfterLast()) {
-//                    if (PhoneNumberUtils.compare(phoneNum, cursor.getString(1))) {
-//                        id = cursor.getString(0);
-//                        Log.e("kkk", "getContactsIdByPhoneNum: contactsid" + id);
-//                    }
-//                    cursor.moveToNext();
-//                }
-//            }
-//        } catch (Exception e) {
-//            Log.e("kkk", "getContactId error:", e);
-//        } finally {
-//            if (cursor != null) {
-//                cursor.close();
-//            }
-//        }
-//        return id;
-//    }
+    private class LoadSmsTask extends AsyncTask<Object, Object, Integer> {
+        @Override
+        protected void onPreExecute() {
+            mHandler.sendEmptyMessageDelayed(MSG_SHOW_LOADING_DIALOG, 200);
+        }
 
-//
-//    private String getContactsNameByContactsId(String ContactsId) {
-//        Cursor c = null;
-//        String contactsName = null;
-//        try {
-//            c = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-//                    new String[]{ContactsContract.CommonDataKinds.Phone.CONTACT_ID, ContactsContract.PhoneLookup.DISPLAY_NAME},
-//                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = '"
-//                            + ContactsId + "'", // WHERE clause.
-//                    null,
-//                    null);
-//            if (c != null && c.moveToFirst()) {
-//                while (!c.isAfterLast()) {
-//                    contactsName = c.getString(c.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
-//                    c.moveToNext();
-//                }
-//            }
-//        } catch (Exception e) {
-//            Log.e("kkk", "getContactId error:", e);
-//        } finally {
-//            if (c != null) {
-//                c.close();
-//            }
-//        }
-//        return contactsName;
-//    }
+        @Override
+        protected Integer doInBackground(Object... params) {
+            list = SMSDBService.getSmsDetailInfoList();
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            for (int i = 0; i < list.size(); i++) {
+                Log.e("kkkk", "doGetSms: " + list.get(i));
+            }
+            return 0;
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            mHandler.removeMessages(MSG_SHOW_LOADING_DIALOG);
+            mHandler.sendEmptyMessage(MSG_REFRESH_LIST_VIEW);
+            mHandler.sendEmptyMessage(MSG_HIDE_LOADING_DIALOG);
+        }
+    }
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_SHOW_LOADING_DIALOG:
+                    showLoadingDialog();
+                    break;
+                case MSG_HIDE_LOADING_DIALOG:
+                    hideLoadingDialog();
+                    break;
+                case MSG_REFRESH_LIST_VIEW:
+                    refreshListVIew();
+                    break;
+            }
+        }
+    };
+
+    private void refreshListVIew() {
+        if (mSmsListAdapter == null) {
+            mSmsListAdapter = new SmsListAdapter(list, MainActivity.this);
+            sms_list.setAdapter(mSmsListAdapter);
+        } else {
+            mSmsListAdapter.setList(list);
+            mSmsListAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private void hideLoadingDialog() {
+        if (mDialog != null && mDialog.isShowing()) {
+            mDialog.dismiss();
+        }
+    }
+
+    private void showLoadingDialog() {
+        mDialog = LoadingProgressDialog.showDialog(this, "Loading");
+    }
 }

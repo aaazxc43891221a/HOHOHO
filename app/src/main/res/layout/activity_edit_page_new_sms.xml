@@ -163,7 +163,7 @@
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content" />
 
-            <!--<com.first.myapp.com.myapplication.activity.GifView-->
+            <!--<com.first.myapp.com.myapplication.MyViews.GifView-->
                 <!--android:id="@+id/gif_view"-->
                 <!--android:layout_width="wrap_content"-->
                 <!--android:layout_height="wrap_content" />-->

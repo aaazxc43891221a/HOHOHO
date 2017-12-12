@@ -3,4 +3,29 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+
+    <color name="dark_blue">#0a4166</color>
+    <color name="blue">#1792e5</color>
+    <color name="dark_gray">#303030</color>
+    <color name="gray">#707070</color>
+    <color name="light_gray">#c0c0c0</color>
+    <color name="white_95">#f0f0f0</color>
+    <color name="green">#7eb338</color>
+    <color name="honeywell_red">#ee3124</color>
+    <color name="honeywell_pink">#fdeae9</color>
+    <color name="yellow">#ffc627</color>
+    <color name="light_yellow">#ffe393</color>
+    <color name="dark_yellow">#bd571a</color>
+    <color name="orange">#f37021</color>
+    <color name="black">#000000</color>
+    <color name="text_disable">#808080</color>
+    <color name="transparent">#00000000</color>
+    <color name="black_30">#4C000000</color>
+    <color name="black_150">#96000000</color>
+    <color name="white">#ffffff</color>
+    <color name="purple">#800080</color>
+    <color name="datalog_fragment_no_info_bg">#4c303030</color>
+    <color name="transport_gray">#32707070</color>
+    <color name="reside_view_main_background_color">#CC303030</color>
 </resources>

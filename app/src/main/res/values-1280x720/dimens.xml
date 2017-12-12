@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <!-- newly created to adjust UI-->
+    <dimen name="frag_datalog_rl_top">100dp</dimen>
+    <dimen name="frag_datalog_rl_device_icon_bg">80dp</dimen>
+    <dimen name="frag_datalog_rl_device_icon">40dp</dimen>
+    <dimen name="uer_profile_top">120dp</dimen>
+
+
+    <dimen name="frag_head_detail_ll">100dp</dimen>
+
+    <dimen name="event_detail_img">11dp</dimen>
+
+    <dimen name="check_box_size">30dp</dimen>
+    <dimen name="thumbnail_view_size">50dp</dimen>
+
+
+    <dimen name="text_size_20">20sp</dimen>
+    <dimen name="text_size_14">14sp</dimen>
+    <dimen name="text_size_12">12sp</dimen>
+    <dimen name="text_size_10">10sp</dimen>
+    <dimen name="text_size_16">16sp</dimen>
+    <dimen name="text_size_18">18sp</dimen>
+    <dimen name="text_size_15">15sp</dimen>
+
+
+    <dimen name="divide_line_width">1dp</dimen>
+    <dimen name="common_title_size">15sp</dimen>
+    <dimen name="common_text_size">13sp</dimen>
+    <dimen name="red_circle_margin">5dp</dimen>
+    <dimen name="setup_item_width">150dp</dimen>
+</resources>
