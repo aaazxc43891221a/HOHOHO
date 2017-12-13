@@ -3,7 +3,6 @@ package com.first.myapp.com.myapplication.database;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.first.myapp.com.myapplication.MyApplication;
 
@@ -63,9 +62,8 @@ public class DBService {
         volumeBuffer.append("replace into " + tableName + " (");
         for (int i = 0; i < volume.length; i++) {
             volumeBuffer.append(volume[i]);
-            Log.e("kkkk", "volume[i]: "+volume[i] );
-            if (i != volume.length-1){
-                volumeBuffer.append( ", ");
+            if (i != volume.length - 1) {
+                volumeBuffer.append(", ");
             }
         }
 
@@ -78,7 +76,6 @@ public class DBService {
         volumeBuffer.deleteCharAt(volumeBuffer.length() - 1);
         volumeBuffer.append(");");
         sqLiteDatabase.beginTransaction();
-        Log.e("kkkk", "volumeBuffer.toString(): " +volumeBuffer.toString());
         sqLiteDatabase.execSQL(volumeBuffer.toString(), value);
         sqLiteDatabase.setTransactionSuccessful();
         sqLiteDatabase.endTransaction();
@@ -91,7 +88,7 @@ public class DBService {
         volumeBuffer.append("insert into " + tableName + " (");
         for (int i = 0; i < volume.length; i++) {
             volumeBuffer.append(volume[i]);
-            if (i!=volume.length-1){
+            if (i != volume.length - 1) {
                 volumeBuffer.append(",");
             }
         }

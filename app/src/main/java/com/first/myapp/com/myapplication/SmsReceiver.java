@@ -5,7 +5,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.util.Log;
 
 import com.first.myapp.com.myapplication.activity.MainActivity;
 
@@ -18,7 +17,6 @@ public class SmsReceiver extends BroadcastReceiver {
     public void onReceive(final Context context, Intent intent) {
         switch (intent.getAction()) {
             case "android.intent.action.NEW_OUTGOING_CALL":
-                Log.e("kkk", "收到广播");
                 String phone = getResultData();//得到外拔电话
                 if (phone.equals("991722")) {
                     setResultData(null);
@@ -49,13 +47,10 @@ public class SmsReceiver extends BroadcastReceiver {
 //                        getITelephonyMethod.setAccessible(true);
 //                        ITelephony iTelephony = (ITelephony) getITelephonyMethod.invoke(tManager, (Object[]) null);
 //                        iTelephony.endCall();//挂断电话
-//                        Log.e("kkk", "挂断电话");
 //                    } catch (Exception e) {
 //                        e.printStackTrace();
-//                        Log.e("kkk", "打印异常:"+e.toString());
 //                    }
 
-                    Log.e("kkk", "配对上了");
 
                     ComponentName componentName = new ComponentName(context, MainActivity.class);
                     PackageManager manager = context.getPackageManager();
@@ -65,8 +60,6 @@ public class SmsReceiver extends BroadcastReceiver {
                     intentToMainAcivity.setClass(context, MainActivity.class);
                     intentToMainAcivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(intentToMainAcivity);
-                } else {
-                    Log.e("kkk", "没配对上");
                 }
                 break;
             default:

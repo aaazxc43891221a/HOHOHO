@@ -43,20 +43,7 @@ public class SMSDBService {
         return SMSDBService;
     }
 
-    private void insertSmsInfo(ContentValues values) {
-//        ContentValues values = new ContentValues();
-        //发送时间
-        values.put("date", System.currentTimeMillis() - 86400000);
-        //阅读状态
-        values.put("read", 0);
-        //1为收 2为发
-        values.put("type", 1);
-        //送达号码
-        values.put("address", "58888");
-        //送达内容
-        values.put("body", "lalala test");
-
-        values.put("person", getContactsIdByPhoneNum("58888"));
+    public void insertSmsInfo(ContentValues values) {
         resolver.insert(Uri.parse(uriSms), values);
     }
 
@@ -83,6 +70,9 @@ public class SMSDBService {
         resolver.insert(Uri.parse(uriSms), values);
     }
 
+//    public void insertSmsInfo(ContentValues values) {
+//        resolver.insert(Uri.parse(uriSms), values);
+//    }
     public void modifySmsInfo() {
         ContentValues values = new ContentValues();
         //发送时间
@@ -116,13 +106,11 @@ public class SMSDBService {
                 while (!cursor.isAfterLast()) {
                     if (PhoneNumberUtils.compare(phoneNum, cursor.getString(1))) {
                         id = cursor.getString(0);
-                        Log.e("kkk", "getContactsIdByPhoneNum: contactsid" + id);
                     }
                     cursor.moveToNext();
                 }
             }
         } catch (Exception e) {
-            Log.e("kkk", "getContactId error:", e);
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -142,20 +130,13 @@ public class SMSDBService {
             // 获取联系人的name
             String contactName = cursorContent.getString(cursorContent
                     .getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-            Log.e("kkk", "contactid: " + contactid + "    contactName: " + contactName);
 
 //            //获取联系人号码
-//            String phoneNum = cursorContent.getString(
-//                    cursorContent.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-//            Log.e("kkk", "phoneNum: "+phoneNum );
-//            map.put(phoneNum, contactName);
-
             Cursor phoneNumbers = resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = "
                     + contactid, null, null);
             // 取得电话号码(可能存在多个号码)
             while (phoneNumbers.moveToNext()) {
                 String originalPhoneNumber = phoneNumbers.getString(phoneNumbers.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                Log.e("rrrr", "originalPhoneNumber: " + originalPhoneNumber);
                 String formatPhoneNumber = formatPhoneNumber(originalPhoneNumber);
                 map.put(formatPhoneNumber, contactName);
 //                sbLog.append("Phone=" + originalPhoneNumber + ";");
@@ -187,7 +168,6 @@ public class SMSDBService {
 
             //联系人列表里的序号
             int contentId = cursorSms.getInt(cursorSms.getColumnIndex("person"));
-//            Log.e("kkk", "contentId: " + contentId);
             String contactsName = map.get(formatPhoneNumber(phoneNumber));
             if (contactsName == null) {
                 contactsName = "null";
@@ -195,7 +175,6 @@ public class SMSDBService {
             list.add(new SmsDetailInfo(0, phoneNumber, contactsName, smsType, data));
         }
         cursorSms.close();
-        Log.e("kkkk", "getSmsDetailInfoList: list: " + list);
         return list;
 
     }
@@ -237,7 +216,6 @@ public class SMSDBService {
                 }
             }
         } catch (Exception e) {
-            Log.e("kkk", "getContactId error:", e);
         } finally {
             if (c != null) {
                 c.close();
@@ -260,7 +238,6 @@ public class SMSDBService {
                 null); // Sort order.
 
         if (cursor == null) {
-            Log.e("kkk", "getPeople null");
             return null;
         }
         for (int i = 0; i < cursor.getCount(); i++) {

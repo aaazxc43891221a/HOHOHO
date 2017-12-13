@@ -1,10 +1,11 @@
 package com.first.myapp.com.myapplication.util;
 
 import android.os.Environment;
-import android.support.v7.appcompat.BuildConfig;
 import android.text.TextUtils;
 import android.util.Log;
 
+
+import com.first.myapp.com.myapplication.BuildConfig;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -87,6 +88,8 @@ public class LogUtil {
                     break;
             }
         }
+        Log.e("kkkk", "isLogSaved: "+isLogSaved );
+        Log.e("kkkk", "BuildConfig.DEBUG: "+ BuildConfig.DEBUG );
         if (isLogSaved && BuildConfig.DEBUG) {
             saveLogToFile(level, tag, message);
         }
@@ -98,7 +101,7 @@ public class LogUtil {
         }
         try {
             if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-                String path = SD_PATH + "/DeviceConfigurator/LogUtil/";
+                String path = SD_PATH + "/mp_log/";
                 File dir = new File(path);
                 if (!dir.exists()) {
                     dir.mkdirs();

@@ -27,6 +27,7 @@ import com.first.myapp.com.myapplication.SmsListAdapter;
 import com.first.myapp.com.myapplication.database.MyContactDBService;
 import com.first.myapp.com.myapplication.database.SMSDBService;
 import com.first.myapp.com.myapplication.util.AsyncTaskExecutorUtil;
+import com.first.myapp.com.myapplication.util.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-        Log.e("kkkk", "onResume: ");
         getPermissionAndSetDefaultApp();
     }
 
@@ -138,9 +138,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case MY_RUNTIME_PERMISSIONS:
-                Log.e("kkk", "执行doGetSms();");
                 contactDBService.refreshTable();
+                Log.e("kkkk", "onRequestPermissionsResult: ");
                 doGetSms();
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    LogUtil.log(LogUtil.LogLevel.DEBUG,"test1","test1");
+                }
                 break;
             default:
                 break;
@@ -149,7 +152,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void initView() {
-
         sms_list = (ListView) findViewById(R.id.sms_tab);
         bt_query = (Button) findViewById(R.id.query_sms);
         bt_query.setOnClickListener(this);
@@ -172,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void doGetSms() {
+        Log.e("kkkk", "doGetSms: " );
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
             LoadSmsTask loadSmsTask = new LoadSmsTask();
@@ -188,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                TimePickerDialog timePickerDialog = new TimePickerDialog(this);
 //                timePickerDialog.show();
 //                SMSDBService.insertSmsInfo();
+                Log.e("kkkk", "query_sms: ");
                 doGetSms();
 //                SMSDBService.modifySmsInfo();
                 break;
@@ -233,9 +237,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }
-            for (int i = 0; i < list.size(); i++) {
-                Log.e("kkkk", "doGetSms: " + list.get(i));
             }
             return 0;
         }

@@ -1,16 +1,23 @@
 package com.first.myapp.com.myapplication.activity;
 
+import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.telephony.PhoneNumberUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.first.myapp.com.myapplication.R;
+import com.first.myapp.com.myapplication.database.SMSDBService;
 import com.first.myapp.com.wheelview.OnWheelChangedListener;
 import com.first.myapp.com.wheelview.WheelView;
 import com.first.myapp.com.wheelview.adapters.ArrayWheelAdapter;
@@ -35,12 +42,27 @@ public class NewSmsActivity extends AppCompatActivity {
     private int realDay;
     private String[] day_of_week = {"星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"};
     TextView txtAutoNaviInfo;
+    private Button mBuildMsgButton;
+    private Activity mActivity;
+    private EditText mReadingTypeText;
+
+
+    private long mDate = 0;
+    private int mReadingType = -1;
+    private int mReceiveType = -1;
+    private String mPhoneNumber = "";
+    private String mContent = "";
+    private String mContactID = "";
+    private EditText mReceiveTypeText;
+    private EditText mPhoneNumberText;
+    private EditText mContentText;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_page_new_sms);
-        initView();
+        mActivity = this;
+        initViews();
         setDefaulDateInWheel();
 //        final GifView gifView = (GifView)findViewById(R.id.gif_view);
 //        gifView.setMovieResource(R.raw.run);
@@ -53,17 +75,22 @@ public class NewSmsActivity extends AppCompatActivity {
     }
 
 
-
-    private void initView() {
+    private void initViews() {
         day = (WheelView) findViewById(R.id.wheel_day_new_sms);
         month = (WheelView) findViewById(R.id.wheel_month_new_sms);
         year = (WheelView) findViewById(R.id.wheel_year_new_sms);
+        mReadingTypeText = (EditText) findViewById(R.id.edit_page_new_sms_reading_type);
+        mReceiveTypeText = (EditText) findViewById(R.id.edit_page_new_sms_send_type);
+        mPhoneNumberText = (EditText) findViewById(R.id.edit_page_new_sms_phone_num);
+        mContentText = (EditText) findViewById(R.id.edit_page_new_sms_content);
+
+        mBuildMsgButton = (Button) findViewById(R.id.bt_build_msg);
+        mBuildMsgButton.setOnClickListener(mBuildMsgButtonOnclick);
     }
 
     private void setDefaulDateInWheel() {
         calendar = Calendar.getInstance();
         int j = calendar.get(Calendar.DAY_OF_WEEK);
-        Log.e("kkk", "j: " + j);
         realYear = calendar.get(Calendar.YEAR);
         realMonth = calendar.get(Calendar.MONTH);
         realDay = calendar.get(Calendar.DAY_OF_MONTH);
@@ -86,7 +113,6 @@ public class NewSmsActivity extends AppCompatActivity {
 
         //month
         int curMonth = calendar.get(Calendar.MONTH);
-        Log.e("kkk", "setDefaulDateInWheel: " + curMonth);
         String months[] = new String[]{"一月", "二月", "三月", "四月", "五月",
                 "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"};
         month.setViewAdapter(new DateArrayAdapter(this, months, curMonth));
@@ -94,7 +120,6 @@ public class NewSmsActivity extends AppCompatActivity {
         month.addChangingListener(listener);
 
         //day
-        Log.e("kkk", "calendar.get(Calendar.DAY_OF_WEEK)" + (calendar.get(Calendar.DAY_OF_WEEK)));
         int curDay = calendar.get(Calendar.DAY_OF_MONTH) - 1;
         int maxDays = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
 //        day.setViewAdapter(new DayDateNumericAdapter(this, 1, maxDays, calendar.get(Calendar.DAY_OF_MONTH) - 1));
@@ -106,21 +131,17 @@ public class NewSmsActivity extends AppCompatActivity {
     private void updateDays(WheelView year, WheelView month, WheelView day) {
         calendar.set(Calendar.YEAR, 1980 + year.getCurrentItem());
 
-        Log.e("kkk", "year: " + (1980 + year.getCurrentItem()));
 
         calendar.set(Calendar.MONTH, month.getCurrentItem());
-        Log.e("kkk", "month: " + month.getCurrentItem());
         int curDay = day.getCurrentItem();
         int maxDays = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
 
         int temp = calendar.get(Calendar.DAY_OF_MONTH);
         calendar.set(Calendar.DAY_OF_MONTH, 1);
         int i = calendar.get(Calendar.DAY_OF_WEEK);
-        Log.e("kkk", "i: " + i);
         calendar.set(Calendar.DAY_OF_MONTH, temp);
         day.setViewAdapter(new DayDateNumericAdapter(this, 1, maxDays, -1, initDayOfWeek(i)));
         int realDay = maxDays < curDay + 1 ? 0 : curDay;
-        Log.e("kkk", "maxDays: " + maxDays + "    curDay + 1: " + (curDay + 1));
         day.setCurrentItem(realDay, true);
     }
 
@@ -128,9 +149,7 @@ public class NewSmsActivity extends AppCompatActivity {
         String[] strings = new String[7];
 //        System.arraycopy(mBytes, 7, mDataBytes, 0, mDataLength - 6);
         System.arraycopy(day_of_week, firstWeekDayOfMonth - 1, strings, 0, day_of_week.length - firstWeekDayOfMonth + 1);
-        Log.e("kkk", "strings: " + strings[0] + " " + strings[1] + " " + strings[2] + " " + strings[3] + " " + strings[4] + " " + strings[5] + " " + strings[6] + " ");
         System.arraycopy(day_of_week, 0, strings, day_of_week.length - firstWeekDayOfMonth + 1, firstWeekDayOfMonth - 1);
-        Log.e("kkk", "strings: " + strings[0] + " " + strings[1] + " " + strings[2] + " " + strings[3] + " " + strings[4] + " " + strings[5] + " " + strings[6] + " ");
         return strings;
     }
 
@@ -154,12 +173,13 @@ public class NewSmsActivity extends AppCompatActivity {
 //                String p_time = str_year + "-" + str_month + "-01";
 
                 if (realYear == calendar.get(Calendar.YEAR) &&
-                    realMonth == calendar.get(Calendar.MONTH)&&
-                    realDay == index +1) {
+                        realMonth == calendar.get(Calendar.MONTH) &&
+                        realDay == index + 1) {
                     return "今天";
-                }else {
-                String dayOfMonth = Integer.toString(value);
-                return dayOfMonth + "号 " + strings[index % 7];}
+                } else {
+                    String dayOfMonth = Integer.toString(value);
+                    return dayOfMonth + "号 " + strings[index % 7];
+                }
             }
             return null;
         }
@@ -232,5 +252,114 @@ public class NewSmsActivity extends AppCompatActivity {
             currentItem = index;
             return super.getItem(index, cachedView, parent);
         }
+    }
+
+    private View.OnClickListener mBuildMsgButtonOnclick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (checkInputValid()) {
+                ContentValues values = new ContentValues();
+                values.put("date", mDate);
+                //阅读状态
+                values.put("read", mReadingType);
+                //1为收 2为发
+                values.put("type", mReceiveType);
+                //送达号码
+                values.put("address", mPhoneNumber);
+                //送达内容
+                values.put("body", mContent);
+                if (mContactID != null) {
+                    values.put("person", mContactID);
+                }
+                SMSDBService.shareInstance(mActivity).insertSmsInfo(values);
+
+            }
+        }
+    };
+
+    private boolean checkInputValid() {
+//        try {
+//            int tempReadingType = Integer.parseInt(mReadingTypeText.getText().toString());
+//            if (tempReadingType != 0 && tempReadingType != 1) {
+//                return false;
+//            } else {
+//                mReadingType = tempReadingType;
+//            }
+//        } catch (NumberFormatException e) {
+//            e.printStackTrace();
+//            return false;
+//        }
+
+        mDate = System.currentTimeMillis();
+
+        try {
+            int tempReadingType = Integer.parseInt(mReadingTypeText.getText().toString());
+            if (tempReadingType != 0 && tempReadingType != 1) {
+                return false;
+            } else {
+                mReadingType = tempReadingType;
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        try {
+            int tempReceiveType = Integer.parseInt(mReceiveTypeText.getText().toString());
+            if (tempReceiveType != 1 && tempReceiveType != 2) {
+                return false;
+            } else {
+                mReceiveType = tempReceiveType;
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+
+        try {
+            mPhoneNumber = mPhoneNumberText.getText().toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        try {
+            mContent = mContentText.getText().toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        mContactID = getContactsIdByPhoneNum(mPhoneNumber);
+        return true;
+    }
+
+
+    private String getContactsIdByPhoneNum(String phoneNum) {
+        String id = null;
+        Cursor cursor = null;
+        try {
+            cursor = mActivity.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                    new String[]{ContactsContract.CommonDataKinds.Phone.CONTACT_ID, ContactsContract.CommonDataKinds.Phone.NUMBER},
+                    ContactsContract.CommonDataKinds.Phone.NUMBER + " = '"
+                            + phoneNum + "'", // WHERE clause.
+                    null,
+                    null);
+            if (cursor != null && cursor.moveToFirst()) {
+                while (!cursor.isAfterLast()) {
+                    if (PhoneNumberUtils.compare(phoneNum, cursor.getString(1))) {
+                        id = cursor.getString(0);
+                    }
+                    cursor.moveToNext();
+                }
+            }
+        } catch (Exception e) {
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return id;
     }
 }
